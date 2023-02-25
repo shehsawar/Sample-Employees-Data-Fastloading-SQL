@@ -1,0 +1,57 @@
+.sessions 2;
+ERRLIMIT 40;
+.LOGON 192.168.25.128/dbc,dbc;
+DATABASE emp;
+.set record vartext ",";
+
+DROP TABLE employees;
+DROP TABLE employees_ERROR1;
+DROP TABLE employees_ERROR2;
+
+CREATE MULTISET TABLE employees, NO FALLBACK, NO BEFORE JOURNAL, NO AFTER JOURNAL
+     (Employee_id 			VARCHAR(200) CHARACTER SET LATIN NOT CASESPECIFIC,
+	 Employee_First_Name 	VARCHAR(200) CHARACTER SET LATIN NOT CASESPECIFIC,
+	 Employee_Second_Name 	VARCHAR(200) CHARACTER SET LATIN NOT CASESPECIFIC,
+	 Department_Name 		VARCHAR(200) CHARACTER SET LATIN NOT CASESPECIFIC,
+	 Age 					VARCHAR(200) CHARACTER SET LATIN NOT CASESPECIFIC,
+	 Gender 				VARCHAR(200) CHARACTER SET LATIN NOT CASESPECIFIC)
+PRIMARY INDEX employees (Employee_id);
+ 
+RECORD 2;
+
+DEFINE
+Employee_id 				(VARCHAR(200)) 
+Employee_First_Name 		(VARCHAR(200)) 
+Employee_Second_Name 		(VARCHAR(200)) 
+Department_Name 			(VARCHAR(200)) 
+Age 						(VARCHAR(200)) 
+Gender 						(VARCHAR(200))
+
+FILE="D:\DWHBI\data analytics SQL\populating DWH\Fast Load.csv";
+
+begin loading
+employees
+errorfiles
+employees_ERROR1, employees_ERROR2
+
+CHECKPOINT 2;
+
+insert into employees
+(employee_id,
+Employee_First_Name,
+Employee_Second_Name,
+Department_Name,
+Age,
+Gender)
+
+VALUES
+(:employee_id,
+:Employee_First_Name,
+:Employee_Second_Name,
+:Department_Name,
+:Age,
+:Gender);
+
+end loading; 
+
+.LOGOFF;
